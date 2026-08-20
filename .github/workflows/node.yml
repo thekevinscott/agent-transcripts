@@ -85,12 +85,12 @@ jobs:
           pnpm install --no-frozen-lockfile
           pnpm run build
         working-directory: packages/node
-      - name: Stage rust binary as platform optional dep
+      - name: Stage rust binary as platform optional dep (flat, as piot publishes it)
         run: |
           pkg=@agent-transcripts/x86_64-unknown-linux-gnu
           target=packages/node/node_modules/$pkg
-          mkdir -p "$target/bin"
+          mkdir -p "$target"
           printf '{"name":"%s","version":"0.0.1"}\n' "$pkg" > "$target/package.json"
-          install -m 755 packages/rust/target/release/agent-transcripts "$target/bin/agent-transcripts"
+          install -m 755 packages/rust/target/release/agent-transcripts "$target/agent-transcripts"
       - name: Smoke (--version via node wrapper -> rust binary)
         run: node packages/node/dist/bin.js --version
