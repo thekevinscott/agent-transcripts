@@ -49,7 +49,7 @@ Variables own their values. Values are freed at the closing brace of their owner
 ## Idiomatic patterns (what GOOD looks like)
 
 ### Error handling
-- Helper functions return precise error types: `io::Result<T>`, `Result<T, MyNewProductError>`.
+- Helper functions return precise error types: `io::Result<T>`, `Result<T, AgentTranscriptsError>`.
 - Binary `main` returns `anyhow::Result<()>`.
 - Use `?` for propagation; `.with_context(|| format!("...{var}"))?` to add context at each layer.
 - For libraries, define typed errors with `thiserror`. **Don't use `anyhow` in library APIs.**

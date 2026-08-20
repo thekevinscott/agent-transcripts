@@ -79,19 +79,19 @@ agent-transcripts/
 ```python
 """agent-transcripts - one-line description."""
 
-from agent-transcripts.errors import MyNewProductError, ValidationError, NotFoundError
-from agent-transcripts._version import __version__
+from agent_transcripts.errors import AgentTranscriptsError, ValidationError, NotFoundError
+from agent_transcripts._version import __version__
 
-__all__ = ["MyNewProductError", "ValidationError", "NotFoundError", "__version__"]
+__all__ = ["AgentTranscriptsError", "ValidationError", "NotFoundError", "__version__"]
 ```
 
-For libraries that ship optional heavy subsystems (numpy, torch, etc.), use **PEP 562 lazy imports** to keep `import agent-transcripts` cheap:
+For libraries that ship optional heavy subsystems (numpy, torch, etc.), use **PEP 562 lazy imports** to keep `import agent_transcripts` cheap:
 
 ```python
-# agent-transcripts/__init__.py
+# agent_transcripts/__init__.py
 _LAZY: dict[str, str] = {
-    "evaluate": "agent-transcripts.eval",
-    "tune": "agent-transcripts.tune",
+    "evaluate": "agent_transcripts.eval",
+    "tune": "agent_transcripts.tune",
 }
 
 def __getattr__(name: str):
@@ -148,11 +148,11 @@ dev = [
 ]
 
 [project.scripts]
-agent-transcripts = "agent-transcripts.cli.main:main"
+agent-transcripts = "agent_transcripts.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/org/agent-transcripts"
-Documentation = "https://agent-transcripts.dev"
+Documentation = "https://agent_transcripts.dev"
 Issues = "https://github.com/org/agent-transcripts/issues"
 
 [tool.hatch.version]
@@ -229,7 +229,7 @@ Things worth getting right:
 For application-level config, the minimum:
 
 ```python
-# agent-transcripts/config.py
+# agent_transcripts/config.py
 import os
 from pathlib import Path
 

@@ -35,24 +35,24 @@ When the type hints carry the structure, the prose carries the rationale.
 
 **API reference via `mkdocs-material` + `mkdocstrings`** for new projects; `sphinx` + `sphinx-autodoc` is the mature alternative. Both render docstrings to HTML.
 
-**Exception hierarchy** — define a flat tree at `agent-transcripts/errors.py`, re-export from `__init__.py`:
+**Exception hierarchy** — define a flat tree at `agent_transcripts/errors.py`, re-export from `__init__.py`:
 
 ```python
-# agent-transcripts/errors.py
-class MyNewProductError(Exception):
+# agent_transcripts/errors.py
+class AgentTranscriptsError(Exception):
     """Base exception for agent-transcripts."""
 
-class ValidationError(MyNewProductError):
+class ValidationError(AgentTranscriptsError):
     """A user input failed schema validation."""
 
-class NotFoundError(MyNewProductError):
+class NotFoundError(AgentTranscriptsError):
     """The requested resource does not exist."""
 ```
 
 ```python
-# agent-transcripts/__init__.py
-from agent-transcripts.errors import MyNewProductError, ValidationError, NotFoundError
-__all__ = ["MyNewProductError", "ValidationError", "NotFoundError", "__version__"]
+# agent_transcripts/__init__.py
+from agent_transcripts.errors import AgentTranscriptsError, ValidationError, NotFoundError
+__all__ = ["AgentTranscriptsError", "ValidationError", "NotFoundError", "__version__"]
 ```
 
 Give each failure mode its own exception variant. One variant per condition (lock-poison, init-failure, not-ready) keeps `except` clauses precise.
@@ -80,7 +80,7 @@ agent-transcripts/
     node/              # npm wrapper sibling (see ../typescript/shipping.md)
     python/            # this package
       pyproject.toml
-      src/agent-transcripts/
+      src/agent_transcripts/
         __init__.py
         _binary/
           __init__.py  # entrypoint — execs the staged binary
@@ -103,16 +103,16 @@ dynamic = ["version"]
 requires-python = ">=3.12"
 
 [project.scripts]
-agent-transcripts = "agent-transcripts._binary:entrypoint"
+agent-transcripts = "agent_transcripts._binary:entrypoint"
 
 [tool.maturin]
 python-source = "src"
-include = ["src/agent-transcripts/_binary/**"]
+include = ["src/agent_transcripts/_binary/**"]
 ```
 
 ### Launcher
 
-`src/agent-transcripts/_binary/__init__.py`:
+`src/agent_transcripts/_binary/__init__.py`:
 
 ```python
 import os
@@ -166,7 +166,7 @@ targets = [
 # (npm sibling package omitted — see ../typescript/shipping.md)
 ```
 
-`putitoutthere` cross-compiles the binary per target, stages it into `src/agent-transcripts/_binary/` before maturin runs, and ships one wheel per platform. `pip install agent-transcripts` on any platform gets a working CLI on PATH with no Rust toolchain required.
+`putitoutthere` cross-compiles the binary per target, stages it into `src/agent_transcripts/_binary/` before maturin runs, and ships one wheel per platform. `pip install agent-transcripts` on any platform gets a working CLI on PATH with no Rust toolchain required.
 
 ### Testing
 
@@ -443,7 +443,7 @@ When the Python package wraps a Rust crate via PyO3 + maturin:
   pyo3 = { version = "0.22", default-features = false, features = ["macros"] }
   ```
 
-- **`module-name = "agent-transcripts._mycore"`** with the `_`-prefix convention. The Python package re-exports from the compiled extension.
+- **`module-name = "agent_transcripts._mycore"`** with the `_`-prefix convention. The Python package re-exports from the compiled extension.
 - **Preserve type info across the FFI boundary** — convert Rust types to Python types deliberately:
 
   ```rust
