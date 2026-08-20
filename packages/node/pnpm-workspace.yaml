@@ -1,0 +1,9 @@
+# pnpm 11 no longer reads the `pnpm` field in package.json — settings live
+# here, and the key is `allowBuilds` (a map), not the older
+# `onlyBuiltDependencies` list.
+#
+# esbuild arrives via vitest and has a postinstall that fetches its platform
+# binary. pnpm exits non-zero on un-approved build scripts rather than
+# warning, so omitting this fails CI at install time, before packaging runs.
+allowBuilds:
+  esbuild: true
