@@ -58,11 +58,9 @@ targets = [
   "x86_64-pc-windows-msvc",
 ]
 
-# #3: the engine cross-compiles the per-target binaries. That stamps the crate
-# version before `cargo build` (write-crate-version), which building them from
-# packages/node/scripts/build.mjs did not — every npm binary through 0.0.2
-# reported the previous release's version. Linux rows also go through
-# cargo-zigbuild against a pinned glibc 2.17 floor.
+# The engine cross-compiles the per-target binaries, stamping the crate version
+# first. build.mjs did not, so every npm binary through 0.0.2 reported the
+# previous release's version (#3).
 [package.bundle_cli]
 bin = "agent-transcripts"
 crate_path = "packages/rust"
