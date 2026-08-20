@@ -14,7 +14,7 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Command {
-    /// Detect installed harnesses and register transcript hooks for each.
+    /// Register transcript hooks for one harness.
     Install(InstallArgs),
     /// Run the ingest service: receive transcript bytes, write the tree.
     Ingest(IngestArgs),
