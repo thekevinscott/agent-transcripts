@@ -6,8 +6,8 @@ repos. The original bug is fixed and released; the cleanup is not._
 ## One-line status
 
 `agent-transcripts` npm binaries now report the right version. The launcher
-that got them there is hand-rolled and should be replaced with `bin-shim` as
-soon as bin-shim cuts a release containing `binaryDir`.
+that got them there is hand-rolled and should now be replaced with `bin-shim`
+— **bin-shim 0.2.1 shipped `binaryDir` on 2026-08-20, so this is unblocked.**
 
 ## The original bug
 
@@ -79,20 +79,14 @@ because bin-shim chmods at spawn time.
 A flat layout has no directory to pick, so `main` lands on the binary and the
 chmod hits the right inode. Confirmed above: `-rwxr-xr-x`.
 
-## What is blocked on what
-
-```
-bin-shim #28 (binaryDir)     MERGED, NOT RELEASED  <- the blocker
-  -> bin-shim release
-    -> agent-transcripts: revert bin.ts to bin-shim + binaryDir: ''
-```
-
-Everything else below is independent.
-
 ## Next action, concretely
 
-When bin-shim publishes a version containing `binaryDir` (latest on npm is
-still **0.2.0**, gitHead `041c6d2`, which predates #28):
+Nothing blocks this any more. `bin-shim@0.2.1` is published and carries
+`binaryDir` (verified in the tarball: `dist/resolve/binary.js` destructures
+`binaryDir = 'bin'`).
+
+**`testing-conventions` PR #487 is the reference implementation** — it makes
+exactly this change against the same engine recipe. Read it before starting.
 
 1. Restore `bin-shim` to `packages/node/package.json` dependencies.
 2. Replace `packages/node/src/bin.ts` with the bin-shim call:
@@ -113,10 +107,10 @@ still **0.2.0**, gitHead `041c6d2`, which predates #28):
 | repo | item | state |
 |---|---|---|
 | agent-transcripts | #3 bug, PR #4 | **merged, released 0.0.3, verified** |
-| bin-shim | #25 / PR #28 `binaryDir` | **merged, unreleased** |
+| bin-shim | #25 / PR #28 `binaryDir` | merged, **released as 0.2.1** |
 | bin-shim | #27 testing-conventions gate | open; PR #29 open (another session) |
 | steervec | #12 same version bug | **open, unfixed** |
-| testing-conventions | #485 double-staged binary | **open, unfixed** |
+| testing-conventions | #485 double-staged binary | PR #487 open, green |
 
 ### steervec #12
 
@@ -126,7 +120,7 @@ declares `build = [{ mode = "bundled-cli", ... }]` with **no**
 `write-crate-version` is gated off. Verified live: `@steervec/…@0.0.3` ships
 a binary printing `steervec 0.0.1`. Same fix as here.
 
-### testing-conventions #485
+### testing-conventions #485 (PR #487 open)
 
 Worse shape: it declares `bundle_cli` **and** keeps its own cargo build, so
 platform packages ship the binary **twice** — `package/bin/testing-conventions`
