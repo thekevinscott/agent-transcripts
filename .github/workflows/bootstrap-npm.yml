@@ -1,0 +1,53 @@
+name: Bootstrap npm packages (one-shot)
+
+# One-shot helper to publish 0.0.0-bootstrap stubs for new npm package
+# names so the putitoutthere release workflow can publish real versions
+# via OIDC trusted publishing afterwards. npm trusted publishing binds
+# to an already-published package, so the first publish needs a classic
+# token; this workflow is the bootstrap path.
+#
+# Usage:
+#   1. Create an npm automation token and set it as repo secret NPM_TOKEN.
+#      The token MUST bypass 2FA for writes, or `npm publish` here fails
+#      with `EOTP: This operation requires a one-time password`. Two
+#      options:
+#        a. Classic Automation token — bypasses 2FA by definition. Simplest.
+#        b. Granular token (read+write, short expiry) — when creating it,
+#           explicitly enable the "Bypass 2FA" option. Granular tokens
+#           default to "Require 2FA" and will fail at publish time.
+#   2. gh workflow run bootstrap-npm.yml -f packages="name1,name2,..."
+#   3. Once stubs land, register Trusted Publishers on each package's
+#      npm settings page pointing at this repo + release.yml + the
+#      "release" environment (the env the putitoutthere publish job runs
+#      in — its `environment` input defaults to `release`, and the PyPI
+#      job in release.yml uses the same name).
+#   4. Delete the NPM_TOKEN secret.
+#   5. Re-trigger Release; the engine publishes real versions over the
+#      bootstrap stubs via OIDC.
+#
+# This file can be removed once all agent-transcripts + @agent-transcripts/*
+# npm names exist on the registry — its only job is the first-publish
+# bootstrap.
+
+on:
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: 'Comma-separated list of npm package names to bootstrap'
+        required: true
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+      - uses: astral-sh/setup-uv@v7
+      - name: Publish bootstrap stubs
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PACKAGES: ${{ inputs.packages }}
+        run: uv run --project ci ci bootstrap-npm

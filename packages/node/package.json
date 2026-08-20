@@ -1,0 +1,45 @@
+{
+  "name": "agent-transcripts",
+  "version": "0.0.1",
+  "description": "Capture coding-agent transcripts to disk and expose them as SQL.",
+  "license": "MIT",
+  "repository": "https://github.com/thekevinscott/agent-transcripts",
+  "type": "module",
+  "bin": {
+    "agent-transcripts": "dist/bin.js"
+  },
+  "files": [
+    "dist/",
+    "changelog.d/",
+    "migrations.d/"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "bin-shim": "^0.1.1"
+  },
+  "optionalDependencies": {
+    "@agent-transcripts/x86_64-unknown-linux-gnu": "0.0.1",
+    "@agent-transcripts/aarch64-unknown-linux-gnu": "0.0.1",
+    "@agent-transcripts/x86_64-apple-darwin": "0.0.1",
+    "@agent-transcripts/aarch64-apple-darwin": "0.0.1",
+    "@agent-transcripts/x86_64-pc-windows-msvc": "0.0.1"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "^22.9.0",
+    "@typescript-eslint/eslint-plugin": "^8.61.0",
+    "@typescript-eslint/parser": "^8.61.0",
+    "eslint": "^10.4.1",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.0"
+  }
+}

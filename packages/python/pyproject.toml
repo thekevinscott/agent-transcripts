@@ -1,0 +1,19 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "agent-transcripts"
+dynamic = ["version"]
+description = "Capture coding-agent transcripts to disk and expose them as SQL."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Kevin Scott", email = "me@thekevinscott.com" }]
+
+[project.urls]
+Repository = "https://github.com/thekevinscott/agent-transcripts"
+
+[tool.maturin]
+manifest-path = "../rust/Cargo.toml"
+bindings = "bin"

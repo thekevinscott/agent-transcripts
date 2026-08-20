@@ -1,0 +1,26 @@
+name: Build Check
+
+# PR-time build verification via piot's reusable build workflow — the
+# heavier companion to check.yml. Runs the same plan + per-target build
+# matrix as release.yml (every target in putitoutthere.toml), then stops
+# before publish: no id-token, no registry auth, contents: read only.
+# Catches build/staging breakage on the PR instead of during a Release
+# run on main. Pinned to @v0 to match release.yml / check.yml.
+
+on:
+  pull_request:
+    # Scoped to build inputs — the union of the putitoutthere.toml globs
+    # (packages/**, LICENSE) plus the config and this workflow. Docs-only
+    # and internals-only PRs skip the heavy per-target matrix.
+    paths:
+      - 'packages/**'
+      - 'putitoutthere.toml'
+      - 'LICENSE'
+      - '.github/workflows/build-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-check:
+    uses: thekevinscott/putitoutthere/.github/workflows/build.yml@v0

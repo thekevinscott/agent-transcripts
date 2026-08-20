@@ -1,0 +1,52 @@
+name: Testing Conventions
+
+# Enforce the testing-conventions standard on this repo's packages: every
+# source file must have a colocated unit test (Python `foo.py` -> `foo_test.py`;
+# TypeScript `foo.ts` -> `foo.test.ts`). Calls the upstream reusable workflow,
+# which installs the published `testing-conventions` binary from crates.io and
+# runs each rule as its own job, failing the build on any violation.
+#   https://github.com/thekevinscott/testing-conventions
+#
+# Pinned to the upstream rolling `v0` tag (same convention as check.yml's
+# putitoutthere pin): v0 tracks the latest backwards-compatible release of the
+# reusable workflow.
+#
+# Per-language `path` because this is a monorepo: Python sources live under
+# packages/python, TypeScript under packages/node/src. The reusable workflow
+# scans a single root, so it is called once per language. (Rust uses inline
+# `#[cfg(test)]` tests, so the colocated-file rule does not apply.)
+
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+      - '.github/workflows/conventions.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["python"]'
+      path: packages/python
+
+  typescript:
+    name: TypeScript
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["typescript"]'
+      path: packages/node/src
+      # Static gates only. The suite-executing gates (unit-coverage, mutation,
+      # packaging, e2e-verify) install with `pnpm install --frozen-lockfile`,
+      # which cannot succeed here before the first publish: the placeholder
+      # @agent-transcripts/* optionalDependencies are unpublished, so pnpm cannot
+      # resolve them into the lockfile and every strict install fails on the
+      # specifier mismatch. putitoutthere requires those entries to stay in
+      # package.json (it pins them at the published version on release).
+      # After the first real release — or in a repo cloned from this template
+      # whose packages exist on npm — regenerate pnpm-lock.yaml and delete
+      # this `gates:` line to restore the full suite.
+      gates: '["colocated-test", "unit-lint", "integration-lint"]'
