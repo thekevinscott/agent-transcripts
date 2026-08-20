@@ -254,8 +254,7 @@ agent-transcripts/
       src/
     node/              # npm wrapper, kind = "npm", build = "bundled-cli"
       package.json
-      bin/agent_transcripts.js   # launcher; resolves the per-platform sub-package binary
-      src/
+      src/bin.ts       # launcher; resolves the per-platform sub-package binary
     python/            # PyPI wrapper, kind = "pypi", build = "maturin", bundle_cli
       pyproject.toml
       src/agent_transcripts/
@@ -268,12 +267,11 @@ agent-transcripts/
   LICENSE
 ```
 
-The TS launcher:
+The TS launcher, in outline — `packages/node/src/bin.ts` is the real thing:
 
-```js
-#!/usr/bin/env node
-const { spawnSync } = require('node:child_process');
-const { platform, arch } = process;
+```ts
+import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 
 const triples = {
   'linux-x64':    'x86_64-unknown-linux-gnu',
@@ -283,18 +281,16 @@ const triples = {
   'win32-x64':    'x86_64-pc-windows-msvc',
 };
 
-const triple = triples[`${platform}-${arch}`];
-if (!triple) {
-  console.error(`agent-transcripts: unsupported platform ${platform}-${arch}`);
-  process.exit(1);
-}
-const pkg = `@agent-transcripts/${triple}`;
-const binary = require.resolve(
-  `${pkg}/bin/agent-transcripts${platform === 'win32' ? '.exe' : ''}`,
-);
-const result = spawnSync(binary, process.argv.slice(2), { stdio: 'inherit' });
-process.exit(result.status ?? 1);
+const triple = triples[`${process.platform}-${process.arch}`];
+const ext = process.platform === 'win32' ? '.exe' : '';
+const binary = createRequire(import.meta.url)
+  .resolve(`@agent-transcripts/${triple}/agent-transcripts${ext}`);
+process.exit(spawnSync(binary, process.argv.slice(2), { stdio: 'inherit' }).status ?? 1);
 ```
+
+The binary sits at the **platform package root**, not under `bin/`. That is
+where putitoutthere's bundled-cli recipe stages it, and where its npm-platform
+handler expects to find it when it synthesizes the per-platform tarball.
 
 `putitoutthere.toml` for the polyglot release:
 
@@ -343,7 +339,18 @@ targets = [
   "aarch64-apple-darwin",
   "x86_64-pc-windows-msvc",
 ]
+
+[package.bundle_cli]
+bin        = "agent-transcripts"
+crate_path = "packages/rust"
 ```
+
+`[package.bundle_cli]` is what makes the engine cross-compile the per-target
+binaries instead of leaving that to a consumer build script. It stamps the
+crate version before `cargo build`, so the shipped binary reports the release
+it was published as, and it builds the Linux rows through `cargo zigbuild`
+against a pinned glibc 2.17 floor. Without it, `packages/node/scripts/build.mjs`
+is only a `tsc` invocation plus fragment staging.
 
 A change to `packages/rust/` cascades through the dependency graph: the crate publishes first, then the npm family and PyPI wheels with the same version. Each handler's first move is `isPublished` — already-shipped targets skip cleanly, so re-runs are safe.
 

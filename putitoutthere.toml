@@ -57,3 +57,10 @@ targets = [
   "aarch64-apple-darwin",
   "x86_64-pc-windows-msvc",
 ]
+
+# The engine cross-compiles the per-target binaries, stamping the crate version
+# first. build.mjs did not, so every npm binary through 0.0.2 reported the
+# previous release's version (#3).
+[package.bundle_cli]
+bin = "agent-transcripts"
+crate_path = "packages/rust"
