@@ -26,15 +26,20 @@ ORDER BY timestamp, ordinal;
 ## One CLI, three commands
 
 ```sh
-agent-transcripts install    # detect harnesses, register their hooks
-agent-transcripts ingest     # receive transcript bytes, write the tree
-agent-transcripts serve      # serve SQL over the tree
+agent-transcripts install claude-code   # register that harness's hooks
+agent-transcripts ingest                # receive transcript bytes, write the tree
+agent-transcripts serve                 # serve SQL over the tree
 ```
 
-**`install`** detects which harnesses are present and registers the right hook
-for each. Claude Code local, Claude Code cloud environments, and other
-harnesses each need a different registration; the installer works out which
-apply. `--dry-run` reports what it would write without touching anything.
+**`install`** takes the harness to install for. Supported today:
+`claude-code` and `pi`. Each is a distinct hook mechanism and config
+location, so the list is exactly what works rather than a set of labels.
+`--dry-run` reports what it would write without touching anything.
+
+For Claude Code that means registering `Stop` and `SubagentStop`. `Stop`
+fires at the end of each assistant turn, which — with delta upload — captures
+every message written since the last one. `SubagentStop` is needed separately
+because subagent transcripts are their own files.
 
 **`ingest`** receives transcript bytes and explodes them into the tree.
 Uploads are delta-only, by byte offset — a session's transcript is never

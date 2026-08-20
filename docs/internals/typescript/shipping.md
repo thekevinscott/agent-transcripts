@@ -254,11 +254,11 @@ agent-transcripts/
       src/
     node/              # npm wrapper, kind = "npm", build = "bundled-cli"
       package.json
-      bin/agent-transcripts.js   # launcher; resolves the per-platform sub-package binary
+      bin/agent_transcripts.js   # launcher; resolves the per-platform sub-package binary
       src/
     python/            # PyPI wrapper, kind = "pypi", build = "maturin", bundle_cli
       pyproject.toml
-      src/agent-transcripts/
+      src/agent_transcripts/
         __init__.py
         _binary/
           __init__.py  # entrypoint — execs the staged binary
