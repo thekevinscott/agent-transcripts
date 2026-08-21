@@ -270,8 +270,7 @@ agent-transcripts/
 The TS launcher, in outline — `packages/node/src/bin.ts` is the real thing:
 
 ```ts
-import { spawnSync } from 'node:child_process';
-import { createRequire } from 'node:module';
+import { main } from 'bin-shim';
 
 const triples = {
   'linux-x64':    'x86_64-unknown-linux-gnu',
@@ -281,16 +280,31 @@ const triples = {
   'win32-x64':    'x86_64-pc-windows-msvc',
 };
 
-const triple = triples[`${process.platform}-${process.arch}`];
-const ext = process.platform === 'win32' ? '.exe' : '';
-const binary = createRequire(import.meta.url)
-  .resolve(`@agent-transcripts/${triple}/agent-transcripts${ext}`);
-process.exit(spawnSync(binary, process.argv.slice(2), { stdio: 'inherit' }).status ?? 1);
+main({
+  scope: 'agent-transcripts',
+  binaryName: 'agent-transcripts',
+  from: import.meta.url,
+  platformPackage: '@{scope}/{triple}',
+  binaryDir: '',
+  triples,
+})
+  .then((code) => process.exit(code))
+  .catch((err) => { process.stderr.write(`${err.message}\n`); process.exit(1); });
 ```
 
-The binary sits at the **platform package root**, not under `bin/`. That is
-where putitoutthere's bundled-cli recipe stages it, and where its npm-platform
-handler expects to find it when it synthesizes the per-platform tarball.
+**Don't hand-roll this.** `bin-shim` owns triple expansion, spawn, exit-code
+forwarding, and the not-installed message. Two options carry the whole
+difference from its defaults:
+
+- `binaryDir: ''` — the binary sits at the **platform package root**, not under
+  `bin/`. That is where putitoutthere's bundled-cli recipe stages it, and where
+  its npm-platform handler expects to find it when it synthesizes the
+  per-platform tarball. `bin-shim` defaults to `bin`, so this is required.
+- `platformPackage: '@{scope}/{triple}'` — the sub-packages are named by rust
+  triple. The default template is `@{scope}/{platform}-{arch}`, which would
+  resolve `@agent-transcripts/linux-x64` and find nothing.
+
+Requires `bin-shim@>=0.2.1`; earlier versions hardcoded the `bin/` segment.
 
 `putitoutthere.toml` for the polyglot release:
 

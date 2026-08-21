@@ -23,6 +23,9 @@
   "engines": {
     "node": ">=22"
   },
+  "dependencies": {
+    "bin-shim": "^0.2.2"
+  },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^22.9.0",
