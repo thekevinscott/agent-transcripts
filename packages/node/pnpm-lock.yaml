@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      bin-shim:
+        specifier: ^0.2.2
+        version: 0.2.2
     devDependencies:
       '@stylistic/eslint-plugin':
         specifier: ^5.10.0
@@ -511,6 +515,10 @@ packages:
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
+
+  bin-shim@0.2.2:
+    resolution: {integrity: sha512-G+f67xoIHsAgoJdG03LV5ei91G6P0QH6tI1h/rKSb//EYdF8mw6eBLCUqqZBdzL9sROVz3/141X/wjutdxWFuQ==}
+    engines: {node: '>=20.20.0'}
 
   brace-expansion@5.0.7:
     resolution: {integrity: sha512-7oFy703dxfY3/NLxC1fh2SUCQ0H9rmAY+5EpDVfXjUTTs+HEwR2nYaqLv+GWcTsumwxPfiz6CzCNkwXwBUwqCA==}
@@ -1319,6 +1327,8 @@ snapshots:
   assertion-error@2.0.1: {}
 
   balanced-match@4.0.4: {}
+
+  bin-shim@0.2.2: {}
 
   brace-expansion@5.0.7:
     dependencies:
