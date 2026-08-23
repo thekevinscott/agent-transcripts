@@ -11,6 +11,10 @@ jobs:
     name: 'CI Gate'
     runs-on: ubuntu-latest
     steps:
-      - uses: thekevinscott/pr-monitor@v1
+      # Pinned to the pre-2026-08-21 v1. The rolling tag moved to willfire
+      # 0.1.11, which refuses to gate the dynamic-matrix checks our reusable
+      # workflows produce until jobs are granted real execution via the new
+      # `execute` input — a trust decision tracked in #8, not made here.
+      - uses: thekevinscott/pr-monitor@c4cf535ad67e072d17c0dba1709ae1836f72c040 # v1 @ 2026-08-20
         with:
           job-name: 'CI Gate'
